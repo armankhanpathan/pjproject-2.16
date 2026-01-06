@@ -57,6 +57,8 @@
 		7761815E2F03CAE400C3C4C0 /* SIPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7761815D2F03CAE400C3C4C0 /* SIPManager.swift */; };
 		77B069B62F05011000F223BA /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B52F05011000F223BA /* LoginView.swift */; };
 		77B069B82F05036C00F223BA /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B72F05036C00F223BA /* CallView.swift */; };
+		77D62C6E2F0CC91600C57E1C /* OngoingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */; };
+		77D62C722F0CC97E00C57E1C /* PJSIPCallFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +127,8 @@
 		7761815D2F03CAE400C3C4C0 /* SIPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIPManager.swift; sourceTree = "<group>"; };
 		77B069B52F05011000F223BA /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		77B069B72F05036C00F223BA /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
+		77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OngoingCallView.swift; sourceTree = "<group>"; };
+		77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJSIPCallFunctions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +215,8 @@
 			children = (
 				77B069B52F05011000F223BA /* LoginView.swift */,
 				77B069B72F05036C00F223BA /* CallView.swift */,
+				77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */,
+				77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */,
 				3A6FC61B25CBD4540065F472 /* ipjsua_swiftApp.swift */,
 				3A6FC61D25CBD4540065F472 /* ContentView.swift */,
 				3A6FC61F25CBD4550065F472 /* Assets.xcassets */,
@@ -397,8 +403,10 @@
 				77B069B82F05036C00F223BA /* CallView.swift in Sources */,
 				3A6FC77125CBDB620065F472 /* pjsip.m in Sources */,
 				3A6FC61E25CBD4540065F472 /* ContentView.swift in Sources */,
+				77D62C6E2F0CC91600C57E1C /* OngoingCallView.swift in Sources */,
 				7761815E2F03CAE400C3C4C0 /* SIPManager.swift in Sources */,
 				3A6FC61C25CBD4540065F472 /* ipjsua_swiftApp.swift in Sources */,
+				77D62C722F0CC97E00C57E1C /* PJSIPCallFunctions.swift in Sources */,
 				77B069B62F05011000F223BA /* LoginView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

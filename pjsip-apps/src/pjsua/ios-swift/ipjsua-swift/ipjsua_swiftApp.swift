@@ -25,7 +25,10 @@ import AVFoundation
 
 class PjsipVars: ObservableObject {
     @Published var calling = false
-    var dest: String = "sip:77889900@sip.linphone.org"
+    @Published var callAnswered: Bool = false
+    @Published var callEnded: Bool = false
+
+   var dest: String = ""
     var call_id: pjsua_call_id = PJSUA_INVALID_ID.rawValue
     /* Video window */
     @Published var vid_win:UIView? = nil
@@ -209,19 +212,44 @@ private func on_incoming_call(acc_id: pjsua_acc_id, call_id: pjsua_call_id,
     pjsua_call_answer2(call_id, &opt, 200, nil, nil);
 }
 
-private func on_call_state(call_id: pjsua_call_id,
-                           e: UnsafeMutablePointer<pjsip_event>?)
-{
-    var ci = pjsua_call_info();
-    pjsua_call_get_info(call_id, &ci);
-    if (ci.state == PJSIP_INV_STATE_DISCONNECTED) {
-        /* UIView update must be done in the main thread */
-        DispatchQueue.main.sync {
-            AppDelegate.Shared.pjsip_vars.vid_win = nil;
-            AppDelegate.Shared.pjsip_vars.calling = false;
+private func on_call_state(
+    call_id: pjsua_call_id,
+    e: UnsafeMutablePointer<pjsip_event>?
+) {
+    var ci = pjsua_call_info()
+    pjsua_call_get_info(call_id, &ci)
+
+    DispatchQueue.main.async {
+
+        switch ci.state {
+
+        case PJSIP_INV_STATE_CALLING,
+             PJSIP_INV_STATE_EARLY:
+            // Outgoing call ringing
+            AppDelegate.Shared.pjsip_vars.calling = true
+            AppDelegate.Shared.pjsip_vars.callAnswered = false
+            AppDelegate.Shared.pjsip_vars.callEnded = false
+
+        case PJSIP_INV_STATE_CONFIRMED:
+            // Call answered
+            AppDelegate.Shared.pjsip_vars.call_id = call_id
+            AppDelegate.Shared.pjsip_vars.callAnswered = true
+            AppDelegate.Shared.pjsip_vars.calling = true
+
+        case PJSIP_INV_STATE_DISCONNECTED:
+            // ❌ Call rejected OR ended
+            AppDelegate.Shared.pjsip_vars.calling = false
+            AppDelegate.Shared.pjsip_vars.callAnswered = false
+            AppDelegate.Shared.pjsip_vars.callEnded = true
+            AppDelegate.Shared.pjsip_vars.vid_win = nil
+
+        default:
+            break
         }
     }
 }
+
+
 
 private func tupleToArray<Tuple, Value>(tuple: Tuple) -> [Value] {
     let tupleMirror = Mirror(reflecting: tuple)
