@@ -9,71 +9,72 @@ import SwiftUI
 
 struct LoginView: View {
 
-    @State private var username = ""
-    @State private var password = ""
-    @State private var domain = "sip.linphone.org"
+    // MARK: - User Input
+    @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var domain: String = "sip.linphone.org"
 
-    @State private var isLoading = false
+    // MARK: - UI State
+    @State private var isLoading: Bool = false
     @State private var errorMessage: String?
-    @State private var isLoggedIn = false
 
+    // MARK: - Environment
     @EnvironmentObject var pjsipVars: PjsipVars
+    @EnvironmentObject var appSession: AppSession
 
     var body: some View {
-        if #available(iOS 16.0, *) {
-            NavigationStack {
-                VStack(spacing: 16) {
-                    
-                    Text("SIP Login")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 24)
-                    
-                    TextField("SIP Username", text: $username)
-                        .autocapitalization(.none)
-                        .keyboardType(.asciiCapable)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    SecureField("Password", text: $password)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    TextField("SIP Domain", text: $domain)
-                        .autocapitalization(.none)
-                        .keyboardType(.URL)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.footnote)
-                    }
-                    
-                    Button {
-                        login()
-                    } label: {
-                        if isLoading {
-                            ProgressView()
-                        } else {
-                            Text("Login")
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(isLoading)
-                    
-                    Spacer()
-                }
-                .padding()
-                .navigationDestination(isPresented: $isLoggedIn) {
-                    CallView()
-                        .environmentObject(pjsipVars)
-                }
+        VStack(spacing: 16) {
+
+            Spacer()
+
+            Text("SIP Login")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .padding(.bottom, 24)
+
+            TextField("SIP Username", text: $username)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .keyboardType(.asciiCapable)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            SecureField("Password", text: $password)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            TextField("SIP Domain", text: $domain)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .keyboardType(.URL)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(Color.red)
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
             }
-        } else {
-            // Fallback on earlier versions
+
+            Button(action: login) {
+                HStack {
+                    if isLoading {
+                        ProgressView()
+                    } else {
+                        Text("Login")
+                            .fontWeight(.semibold)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(DefaultButtonStyle())
+            .padding(.top, 8)
+            .disabled(isLoading)
+
+            Spacer()
         }
+        .padding()
     }
 
+    // MARK: - Login Logic
     private func login() {
         errorMessage = nil
         isLoading = true
@@ -83,12 +84,17 @@ struct LoginView: View {
             password: password,
             domain: domain
         ) { success, error in
-            isLoading = false
-            if success {
-                isLoggedIn = true
-            } else {
-                errorMessage = error
+
+            DispatchQueue.main.async {
+                isLoading = false
+
+                if success {
+                    appSession.loginSuccess()
+                } else {
+                    errorMessage = error ?? "Login failed. Please try again."
+                }
             }
         }
     }
 }
+

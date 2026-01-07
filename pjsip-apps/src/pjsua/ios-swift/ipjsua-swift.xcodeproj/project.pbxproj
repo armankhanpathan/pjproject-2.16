@@ -59,6 +59,10 @@
 		77B069B82F05036C00F223BA /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B72F05036C00F223BA /* CallView.swift */; };
 		77D62C6E2F0CC91600C57E1C /* OngoingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */; };
 		77D62C722F0CC97E00C57E1C /* PJSIPCallFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */; };
+		77D62C742F0D263100C57E1C /* AppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C732F0D263100C57E1C /* AppSession.swift */; };
+		77D62C762F0D26C900C57E1C /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C752F0D26C900C57E1C /* RootView.swift */; };
+		77D62C782F0D26DD00C57E1C /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C772F0D26DD00C57E1C /* MainTabView.swift */; };
+		77D62C7A2F0D295B00C57E1C /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C792F0D295B00C57E1C /* AccountView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +133,10 @@
 		77B069B72F05036C00F223BA /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
 		77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OngoingCallView.swift; sourceTree = "<group>"; };
 		77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJSIPCallFunctions.swift; sourceTree = "<group>"; };
+		77D62C732F0D263100C57E1C /* AppSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSession.swift; sourceTree = "<group>"; };
+		77D62C752F0D26C900C57E1C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		77D62C772F0D26DD00C57E1C /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		77D62C792F0D295B00C57E1C /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,10 +222,14 @@
 			isa = PBXGroup;
 			children = (
 				77B069B52F05011000F223BA /* LoginView.swift */,
+				77D62C792F0D295B00C57E1C /* AccountView.swift */,
+				77D62C732F0D263100C57E1C /* AppSession.swift */,
 				77B069B72F05036C00F223BA /* CallView.swift */,
 				77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */,
 				77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */,
 				3A6FC61B25CBD4540065F472 /* ipjsua_swiftApp.swift */,
+				77D62C752F0D26C900C57E1C /* RootView.swift */,
+				77D62C772F0D26DD00C57E1C /* MainTabView.swift */,
 				3A6FC61D25CBD4540065F472 /* ContentView.swift */,
 				3A6FC61F25CBD4550065F472 /* Assets.xcassets */,
 				3A6FC62425CBD4550065F472 /* Info.plist */,
@@ -400,9 +412,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77D62C7A2F0D295B00C57E1C /* AccountView.swift in Sources */,
+				77D62C742F0D263100C57E1C /* AppSession.swift in Sources */,
 				77B069B82F05036C00F223BA /* CallView.swift in Sources */,
 				3A6FC77125CBDB620065F472 /* pjsip.m in Sources */,
 				3A6FC61E25CBD4540065F472 /* ContentView.swift in Sources */,
+				77D62C762F0D26C900C57E1C /* RootView.swift in Sources */,
+				77D62C782F0D26DD00C57E1C /* MainTabView.swift in Sources */,
 				77D62C6E2F0CC91600C57E1C /* OngoingCallView.swift in Sources */,
 				7761815E2F03CAE400C3C4C0 /* SIPManager.swift in Sources */,
 				3A6FC61C25CBD4540065F472 /* ipjsua_swiftApp.swift in Sources */,

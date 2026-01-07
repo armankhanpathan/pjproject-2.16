@@ -6,3 +6,24 @@
 //
 
 import Foundation
+import SwiftUI
+
+struct MainTabView: View {
+
+    var body: some View {
+        TabView {
+
+            CallView()
+                .tabItem {
+                    Image(systemName: "phone.fill")
+                    Text("Call")
+                }
+
+            AccountView()
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Account")
+                }
+        }
+    }
+}
