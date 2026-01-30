@@ -9,13 +9,26 @@ import Foundation
 import SwiftUI
 
 final class AppSession: ObservableObject {
+
     @Published var isLoggedIn: Bool = false
+
+    // Logged-in SIP user info
+    @Published var sipUsername: String = ""
+    @Published var sipDomain: String = ""
+
+    var sipURI: String {
+        "sip:\(sipUsername)@\(sipDomain)"
+    }
+
+    func loginSuccess(username: String, domain: String) {
+        self.sipUsername = username
+        self.sipDomain = domain
+        isLoggedIn = true
+    }
 
     func logout() {
         isLoggedIn = false
-    }
-
-    func loginSuccess() {
-        isLoggedIn = true
+        sipUsername = ""
+        sipDomain = ""
     }
 }

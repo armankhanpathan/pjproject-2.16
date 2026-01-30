@@ -10,12 +10,31 @@ import SwiftUI
 struct RootView: View {
 
     @EnvironmentObject var appSession: AppSession
+    @EnvironmentObject var pjsipVars: PjsipVars
 
     var body: some View {
-        if appSession.isLoggedIn {
-            MainTabView()
-        } else {
-            LoginView()
+        ZStack {
+
+            // Main app flow
+            if appSession.isLoggedIn {
+                MainTabView()
+            } else {
+                LoginView()
+            }
+        }
+        // Incoming call screen
+        .fullScreenCover(
+            isPresented: $pjsipVars.hasIncomingCall
+        ) {
+            IncomingCallView()
+                .environmentObject(pjsipVars)
+        }
+        // Ongoing call screen
+        .fullScreenCover(
+            isPresented: $pjsipVars.showOngoingCall
+        ) {
+            OngoingCallView()
+                .environmentObject(pjsipVars)
         }
     }
 }

@@ -1,5 +1,18 @@
+//
+//  ContactsViewModel.swift
+//  ipjsua-swift
+//
+//  Created by Arman Pathan on 13/01/26.
+//
+
 import Foundation
 import Contacts
+
+struct ContactItem: Identifiable {
+    let id = UUID()
+    let name: String
+    let phone: String
+}
 
 final class ContactsViewModel: ObservableObject {
 
@@ -10,12 +23,16 @@ final class ContactsViewModel: ObservableObject {
 
     func requestAndFetchContacts() {
         store.requestAccess(for: .contacts) { granted, _ in
-            DispatchQueue.main.async {
-                if granted {
-                    self.fetchContacts()
-                } else {
+            guard granted else {
+                DispatchQueue.main.async {
                     self.permissionDenied = true
                 }
+                return
+            }
+
+            // Fetch contacts on background thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.fetchContacts()
             }
         }
     }
@@ -34,9 +51,19 @@ final class ContactsViewModel: ObservableObject {
             guard let phone = contact.phoneNumbers.first?.value.stringValue else { return }
 
             let name = "\(contact.givenName) \(contact.familyName)"
+                .trimmingCharacters(in: .whitespaces)
+
             result.append(ContactItem(name: name, phone: phone))
         }
 
-        contacts = result
+        let sorted = result.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+
+        //  UI update on main thread
+        DispatchQueue.main.async {
+            self.contacts = sorted
+        }
     }
+
 }

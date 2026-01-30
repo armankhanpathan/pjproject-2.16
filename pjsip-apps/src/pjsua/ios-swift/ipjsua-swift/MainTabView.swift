@@ -19,6 +19,12 @@ struct MainTabView: View {
                     Text("Call")
                 }
 
+            ContactsView()
+                .tabItem {
+                    Image(systemName: "person.2.fill")
+                    Text("Contacts")
+                }
+
             AccountView()
                 .tabItem {
                     Image(systemName: "person.fill")

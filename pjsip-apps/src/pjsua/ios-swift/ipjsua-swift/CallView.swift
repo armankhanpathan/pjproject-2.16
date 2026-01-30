@@ -10,8 +10,10 @@ import SwiftUI
 struct CallView: View {
 
     @EnvironmentObject var pjsipVars: PjsipVars
+    @Environment(\.presentationMode) var presentationMode
+
     @State private var number = ""
-    @State private var navigate = false
+//    @State private var navigate = false
 
     var body: some View {
         NavigationView {
@@ -33,14 +35,11 @@ struct CallView: View {
                     keypadRow(["*","0","#"], ["","+",""])
                 }
 
-                // Call + Delete aligned to keypad columns
                 HStack(spacing: 18) {
 
-                    // Empty space under "*"
                     Color.clear
                         .frame(width: 78, height: 78)
 
-                    // Call button under "0"
                     Button {
                         startCall()
                     } label: {
@@ -54,7 +53,6 @@ struct CallView: View {
                     .disabled(number.isEmpty)
                     .opacity(number.isEmpty ? 0.4 : 1)
 
-                    // Delete button under "#"
                     if !number.isEmpty {
                         Button(action: eraseLastDigit) {
                             Image(systemName: "delete.left")
@@ -65,7 +63,7 @@ struct CallView: View {
                                 .clipShape(Circle())
                         }
                     } else {
-                        // Preserve alignment when hidden
+                    
                         Color.clear
                             .frame(width: 56, height: 56)
                     }
@@ -74,11 +72,11 @@ struct CallView: View {
 
                 Spacer(minLength: 30)
 
-                NavigationLink(
-                    destination: OngoingCallView()
-                        .environmentObject(pjsipVars),
-                    isActive: $navigate
-                ) { EmptyView() }
+//                NavigationLink(
+//                    destination: OngoingCallView()
+//                        .environmentObject(pjsipVars),
+//                    isActive: $navigate
+//                ) { EmptyView() }
             }
             .padding(.horizontal)
             .navigationBarTitle("", displayMode: .inline)
@@ -106,9 +104,36 @@ struct CallView: View {
     }
 
     private func startCall() {
+
+        //  Prepare destination
         pjsipVars.dest = "sip:\(number)@sip.linphone.org"
-        navigate = true
+
+        //  SHOW ongoing call UI FIRST
+        DispatchQueue.main.async {
+            pjsipVars.showOngoingCall = true
+            pjsipVars.calling = true
+            pjsipVars.callAnswered = false
+        }
+
+        //  Trigger SIP call
+        let userData =
+            UnsafeMutableRawPointer(
+                Unmanaged.passUnretained(pjsipVars).toOpaque()
+            )
+
+        pjsua_schedule_timer2_dbg(
+            call_func,
+            userData,
+            0,
+            "swift-add-call",
+            0
+        )
+
+        //  THEN dismiss dialer
+        presentationMode.wrappedValue.dismiss()
     }
+
+
 
     private func formatted(_ text: String) -> String {
         let chars = Array(text)
@@ -142,6 +167,15 @@ struct DialKey: View {
         }
     }
 }
+
+
+
+
+
+
+
+
+
 
 //import SwiftUI
 //

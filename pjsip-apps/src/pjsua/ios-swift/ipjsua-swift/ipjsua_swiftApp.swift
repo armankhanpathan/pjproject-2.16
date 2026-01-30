@@ -24,12 +24,23 @@ import SwiftUI
 import AVFoundation
 
 class PjsipVars: ObservableObject {
+    
     @Published var calling = false
     @Published var callAnswered: Bool = false
     @Published var callEnded: Bool = false
+    @Published var isOnHold: Bool = false
+    @Published var hasIncomingCall = false
+    @Published var showOngoingCall = false
+    
+    @Published var activeCallIds: [pjsua_call_id] = []
+    @Published var conferenceSlots: [pjsua_call_id: Int] = [:]
+    @Published var isConference: Bool = false
+    @Published var isTransferInProgress = false
 
    var dest: String = ""
     var call_id: pjsua_call_id = PJSUA_INVALID_ID.rawValue
+    var primaryCallId: pjsua_call_id?
+
     /* Video window */
     @Published var vid_win:UIView? = nil
 }
@@ -113,6 +124,8 @@ struct ipjsua_swiftApp: App {
         cfg.cb.on_incoming_call = on_incoming_call;
         cfg.cb.on_call_state = on_call_state;
         cfg.cb.on_call_media_state = on_call_media_state;
+        cfg.cb.on_call_transfer_status = on_call_transfer_status
+
         
         /* Init pjsua */
         status = pjsua_init(&cfg, &log_cfg, &media_cfg);
@@ -199,19 +212,28 @@ struct ipjsua_swiftApp: App {
     }
 }
     
-    private func on_incoming_call(acc_id: pjsua_acc_id, call_id: pjsua_call_id,
-                                  rdata: UnsafeMutablePointer<pjsip_rx_data>?)
-    {
-        var opt = pjsua_call_setting();
-        
-        pjsua_call_setting_default(&opt);
-        opt.aud_cnt = 1;
-        opt.vid_cnt = 1;
-        
-        /* Automatically answer call with 200 */
-        pjsua_call_answer2(call_id, &opt, 200, nil, nil);
+private func on_incoming_call(
+    acc_id: pjsua_acc_id,
+    call_id: pjsua_call_id,
+    rdata: UnsafeMutablePointer<pjsip_rx_data>?
+) {
+    let vars = AppDelegate.Shared.pjsip_vars
+
+    vars.call_id = call_id
+
+    var ci = pjsua_call_info()
+    pjsua_call_get_info(call_id, &ci)
+
+    let caller = String(cString: ci.remote_info.ptr)
+
+    DispatchQueue.main.async {
+        vars.dest = caller
+        vars.calling = true
+        vars.callAnswered = false
+        vars.hasIncomingCall = true
     }
-    
+}
+
     private func on_call_state(
         call_id: pjsua_call_id,
         e: UnsafeMutablePointer<pjsip_event>?
@@ -231,18 +253,36 @@ struct ipjsua_swiftApp: App {
                 AppDelegate.Shared.pjsip_vars.callEnded = false
                 
             case PJSIP_INV_STATE_CONFIRMED:
-                // Call answered
-                AppDelegate.Shared.pjsip_vars.call_id = call_id
-                AppDelegate.Shared.pjsip_vars.callAnswered = true
-                AppDelegate.Shared.pjsip_vars.calling = true
+                let vars = AppDelegate.Shared.pjsip_vars
+
+                if !vars.activeCallIds.contains(call_id) {
+                    vars.activeCallIds.append(call_id)
+                }
+
+                vars.callAnswered = true
+                vars.calling = true
+                vars.showOngoingCall = true
+
+                AppDelegate.Shared.pjsip_vars.showOngoingCall = true
                 
             case PJSIP_INV_STATE_DISCONNECTED:
-                // ❌ Call rejected OR ended
-                AppDelegate.Shared.pjsip_vars.calling = false
-                AppDelegate.Shared.pjsip_vars.callAnswered = false
-                AppDelegate.Shared.pjsip_vars.callEnded = true
-                AppDelegate.Shared.pjsip_vars.vid_win = nil
-                
+
+                let vars = AppDelegate.Shared.pjsip_vars
+
+                // Transfer completed OR normal hangup
+                vars.activeCallIds.removeAll { $0 == call_id }
+                vars.conferenceSlots.removeValue(forKey: call_id)
+
+                if vars.activeCallIds.isEmpty {
+                    vars.calling = false
+                    vars.callAnswered = false
+                    vars.showOngoingCall = false
+                    vars.hasIncomingCall = false
+                    vars.isConference = false
+                    vars.isOnHold = false
+                    vars.call_id = PJSUA_INVALID_ID.rawValue
+                }
+
             default:
                 break
             }
@@ -256,59 +296,60 @@ struct ipjsua_swiftApp: App {
         }
     }
     
-    private func on_call_media_state(call_id: pjsua_call_id)
-    {
-        var ci = pjsua_call_info();
-        pjsua_call_get_info(call_id, &ci);
-        let media: [pjsua_call_media_info] = tupleToArray(tuple: ci.media);
-        
-        for mi in 0...ci.media_cnt {
-            if (media[Int(mi)].status == PJSUA_CALL_MEDIA_ACTIVE ||
-                media[Int(mi)].status == PJSUA_CALL_MEDIA_REMOTE_HOLD)
-            {
-                switch (media[Int(mi)].type) {
-                case PJMEDIA_TYPE_AUDIO:
-                    var call_conf_slot: pjsua_conf_port_id;
-                    
-                    call_conf_slot = media[Int(mi)].stream.aud.conf_slot;
-                    pjsua_conf_connect(call_conf_slot, 0);
-                    pjsua_conf_connect(0, call_conf_slot);
-                    break;
-                    
-                case PJMEDIA_TYPE_VIDEO:
-                    let wid = media[Int(mi)].stream.vid.win_in;
-                    var wi = pjsua_vid_win_info();
-                    
-                    if (pjsua_vid_win_get_info(wid, &wi) == PJ_SUCCESS.rawValue) {
-                        let vid_win:UIView =
-                        Unmanaged<UIView>.fromOpaque(wi.hwnd.info.ios.window).takeUnretainedValue();
-                        
-                        /* For local loopback test, one acts as a transmitter,
-                         the other as a receiver.
-                         */
-                        if (AppDelegate.Shared.pjsip_vars.vid_win == nil) {
-                            /* UIView update must be done in the main thread */
-                            DispatchQueue.main.sync {
-                                AppDelegate.Shared.pjsip_vars.vid_win = vid_win;
-                            }
-                        } else {
-                            if (AppDelegate.Shared.pjsip_vars.vid_win != vid_win) {
-                                /* Transmitter */
-                                var param = pjsua_call_vid_strm_op_param ();
-                                
-                                pjsua_call_vid_strm_op_param_default(&param);
-                                param.med_idx = 1;
-                                pjsua_call_set_vid_strm(call_id,
-                                                        PJSUA_CALL_VID_STRM_START_TRANSMIT,
-                                                        &param);
-                            }
-                        }
-                    }
-                    break;
-                    
-                default:
-                    break;
-                }
+private func on_call_media_state(call_id: pjsua_call_id) {
+
+    let vars = AppDelegate.Shared.pjsip_vars
+
+    if vars.isConference {
+        return
+    }
+
+    if vars.isTransferInProgress {
+        return
+    }
+
+    var ci = pjsua_call_info()
+    pjsua_call_get_info(call_id, &ci)
+
+    let media: [pjsua_call_media_info] = tupleToArray(tuple: ci.media)
+
+    for mi in 0..<ci.media_cnt {
+
+        guard media[Int(mi)].type == PJMEDIA_TYPE_AUDIO else { continue }
+
+        let call_conf_slot = media[Int(mi)].stream.aud.conf_slot
+        if call_conf_slot != PJSUA_INVALID_ID.rawValue {
+
+            DispatchQueue.main.async {
+                vars.conferenceSlots[call_id] = Int(call_conf_slot)
             }
+
+            //  ONLY single-call wiring
+            pjsua_conf_connect(call_conf_slot, 0)
+            pjsua_conf_connect(0, call_conf_slot)
         }
     }
+}
+
+
+private func on_call_transfer_status(
+    call_id: pjsua_call_id,
+    status_code: Int32,
+    status_text: UnsafePointer<pj_str_t>?,
+    final: pj_bool_t,
+    p_cont: UnsafeMutablePointer<pj_bool_t>?
+) {
+    let vars = AppDelegate.Shared.pjsip_vars
+
+    // Transfer fully completed
+    if final == pj_bool_t(PJ_TRUE.rawValue),
+       status_code >= 200 && status_code < 300 {
+
+        //  Disconnect transferrer (A)
+        pjsua_call_hangup(call_id, 200, nil, nil)
+
+        DispatchQueue.main.async {
+            vars.isTransferInProgress = false
+        }
+    }
+}

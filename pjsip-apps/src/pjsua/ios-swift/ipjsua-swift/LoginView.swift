@@ -89,7 +89,11 @@ struct LoginView: View {
                 isLoading = false
 
                 if success {
-                    appSession.loginSuccess()
+                    appSession.loginSuccess(
+                        username: username,
+                        domain: domain
+                    )
+
                 } else {
                     errorMessage = error ?? "Login failed. Please try again."
                 }
@@ -97,4 +101,3 @@ struct LoginView: View {
         }
     }
 }
-

@@ -2,13 +2,14 @@
 //  IncomingCallView.swift
 //  ipjsua-swift
 //
+//  Created by Arman Pathan on 12/01/26.
+//
 
 import SwiftUI
 
 struct IncomingCallView: View {
 
     @EnvironmentObject var pjsipVars: PjsipVars
-    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ZStack {
@@ -41,7 +42,7 @@ struct IncomingCallView: View {
 
                 HStack(spacing: 80) {
 
-                    // Reject
+                    // Reject Call
                     Button {
                         rejectCall()
                     } label: {
@@ -55,7 +56,7 @@ struct IncomingCallView: View {
                             )
                     }
 
-                    // Accept
+                    // Accept Call
                     Button {
                         acceptCall()
                     } label: {
@@ -83,6 +84,7 @@ struct IncomingCallView: View {
                 Unmanaged.passUnretained(pjsipVars).toOpaque()
             )
 
+        // Answer call
         pjsua_schedule_timer2_dbg(
             answer_call,
             userData,
@@ -90,6 +92,7 @@ struct IncomingCallView: View {
             "swift-answer",
             0
         )
+        
     }
 
     private func rejectCall() {
@@ -98,6 +101,7 @@ struct IncomingCallView: View {
                 Unmanaged.passUnretained(pjsipVars).toOpaque()
             )
 
+        // Reject call
         pjsua_schedule_timer2_dbg(
             reject_call,
             userData,
@@ -105,7 +109,6 @@ struct IncomingCallView: View {
             "swift-reject",
             0
         )
-
-        presentationMode.wrappedValue.dismiss()
+       
     }
 }

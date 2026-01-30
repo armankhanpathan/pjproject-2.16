@@ -54,6 +54,9 @@
 		3A6FC7F425CD1A3E0065F472 /* libpjmedia-audiodev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A6FC7E025CD1A3D0065F472 /* libpjmedia-audiodev.a */; };
 		3AF9B5372B7B454D0043987D /* ipjsua_swiftVidTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF9B5362B7B454D0043987D /* ipjsua_swiftVidTest.swift */; };
 		3AF9B5392B7B454D0043987D /* ipjsua_swiftVidTestLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF9B5382B7B454D0043987D /* ipjsua_swiftVidTestLaunchTests.swift */; };
+		7743A9B82F1602D200694E8A /* ContactsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7743A9B72F1602D200694E8A /* ContactsViewModel.swift */; };
+		7743A9BA2F1602E400694E8A /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7743A9B92F1602E400694E8A /* ContactsView.swift */; };
+		77599B542F14DEE700D0DAF5 /* IncomingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77599B532F14DEE700D0DAF5 /* IncomingCallView.swift */; };
 		7761815E2F03CAE400C3C4C0 /* SIPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7761815D2F03CAE400C3C4C0 /* SIPManager.swift */; };
 		77B069B62F05011000F223BA /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B52F05011000F223BA /* LoginView.swift */; };
 		77B069B82F05036C00F223BA /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B72F05036C00F223BA /* CallView.swift */; };
@@ -128,6 +131,9 @@
 		3AF9B5362B7B454D0043987D /* ipjsua_swiftVidTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ipjsua_swiftVidTest.swift; sourceTree = "<group>"; };
 		3AF9B5382B7B454D0043987D /* ipjsua_swiftVidTestLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ipjsua_swiftVidTestLaunchTests.swift; sourceTree = "<group>"; };
 		3AF9B53F2B7B583C0043987D /* ipjsua-swift.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ipjsua-swift.xctestplan"; sourceTree = "<group>"; };
+		7743A9B72F1602D200694E8A /* ContactsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewModel.swift; sourceTree = "<group>"; };
+		7743A9B92F1602E400694E8A /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
+		77599B532F14DEE700D0DAF5 /* IncomingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallView.swift; sourceTree = "<group>"; };
 		7761815D2F03CAE400C3C4C0 /* SIPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIPManager.swift; sourceTree = "<group>"; };
 		77B069B52F05011000F223BA /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		77B069B72F05036C00F223BA /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
@@ -222,10 +228,13 @@
 			isa = PBXGroup;
 			children = (
 				77B069B52F05011000F223BA /* LoginView.swift */,
+				77599B532F14DEE700D0DAF5 /* IncomingCallView.swift */,
 				77D62C792F0D295B00C57E1C /* AccountView.swift */,
 				77D62C732F0D263100C57E1C /* AppSession.swift */,
 				77B069B72F05036C00F223BA /* CallView.swift */,
 				77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */,
+				7743A9B72F1602D200694E8A /* ContactsViewModel.swift */,
+				7743A9B92F1602E400694E8A /* ContactsView.swift */,
 				77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */,
 				3A6FC61B25CBD4540065F472 /* ipjsua_swiftApp.swift */,
 				77D62C752F0D26C900C57E1C /* RootView.swift */,
@@ -414,6 +423,9 @@
 			files = (
 				77D62C7A2F0D295B00C57E1C /* AccountView.swift in Sources */,
 				77D62C742F0D263100C57E1C /* AppSession.swift in Sources */,
+				77599B542F14DEE700D0DAF5 /* IncomingCallView.swift in Sources */,
+				7743A9BA2F1602E400694E8A /* ContactsView.swift in Sources */,
+				7743A9B82F1602D200694E8A /* ContactsViewModel.swift in Sources */,
 				77B069B82F05036C00F223BA /* CallView.swift in Sources */,
 				3A6FC77125CBDB620065F472 /* pjsip.m in Sources */,
 				3A6FC61E25CBD4540065F472 /* ContentView.swift in Sources */,

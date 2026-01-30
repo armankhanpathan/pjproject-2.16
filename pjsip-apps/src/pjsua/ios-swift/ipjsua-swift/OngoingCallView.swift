@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFAudio
+import Combine
 
 struct OngoingCallView: View {
 
@@ -15,9 +16,17 @@ struct OngoingCallView: View {
 
     @State private var secondsElapsed = 0
     @State private var timer: Timer?
+
     @State private var isSpeakerOn = false
     @State private var isMicMuted = false
 
+    @State private var showDialer = false
+    @State private var isAddingCall = false
+
+    @State private var showTransfer = false
+    @State private var transferTarget = ""
+
+    // MARK: - UI
 
     var body: some View {
         ZStack {
@@ -27,12 +36,12 @@ struct OngoingCallView: View {
 
                 Spacer()
 
-                // Calling OR Timer (strict logic)
+                // Calling OR Timer
                 Text(pjsipVars.callAnswered ? formattedTime : "Calling")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                // SIP Username (single line, centered)
+                // SIP Username
                 Text(pjsipVars.dest)
                     .font(.system(size: 34, weight: .semibold))
                     .foregroundColor(.white)
@@ -52,82 +61,141 @@ struct OngoingCallView: View {
 
                 Spacer()
 
-                // Controls (larger buttons)
                 VStack(spacing: 28) {
+
+                    // Row 1
                     HStack(spacing: 56) {
                         speakerButton
-                        actionButton(icon: "video.fill", title: "FaceTime")
+                        holdButton
                         muteButton
                     }
 
+                    // Merge Calls
+                    if pjsipVars.activeCallIds.count == 2 && !pjsipVars.isConference {
+                        Button("Merge Calls") {
+                            mergeCalls()
+                        }
+                        .foregroundColor(.blue)
+                    }
+
+                    // Row 2
                     HStack(spacing: 56) {
-                        actionButton(icon: "person.badge.plus", title: "Add")
+                        transferButton
                         endCallButton
-                        actionButton(icon: "circle.grid.3x3.fill", title: "Keypad")
+                        addCallButton
                     }
                 }
 
                 Spacer(minLength: 28)
             }
         }
-        .onAppear {
-            triggerCallOrHangup()
-        }
-        .onChange(of: pjsipVars.callAnswered) { answered in
-            answered ? startTimer() : stopTimer()
-        }
+
+//        .onAppear {
+//            if isAddingCall { return }
+//
+//            if !pjsipVars.callAnswered && !pjsipVars.hasIncomingCall {
+//                triggerCallOrHangup()
+//            }
+//        }
         .onDisappear {
             stopTimer()
         }
-        .onChange(of: pjsipVars.callEnded) { ended in
+
+        // callAnswered observer
+        .onReceive(Just(pjsipVars.callAnswered)) { answered in
+            answered ? startTimer() : stopTimer()
+        }
+
+        // callEnded observer
+        .onReceive(Just(pjsipVars.callEnded)) { ended in
             if ended {
+                stopTimer()
                 presentationMode.wrappedValue.dismiss()
             }
         }
 
-    }
-
-    // MARK: - Speaker Control
-
-    private func toggleSpeaker() {
-        isSpeakerOn.toggle()
-
-        let session = AVAudioSession.sharedInstance()
-        do {
-            if isSpeakerOn {
-                try session.overrideOutputAudioPort(.speaker)
-            } else {
-                try session.overrideOutputAudioPort(.none)
+        // Reset add-call state
+        .onReceive(Just(showDialer)) { active in
+            if !active {
+                isAddingCall = false
             }
-            try session.setActive(true)
-        } catch {
-            print("Speaker toggle error:", error)
+        }
+
+        // MARK: - Add Call Dial Pad 
+        .sheet(isPresented: $showDialer) {
+            CallView()
+                .environmentObject(self.pjsipVars)
+        }
+
+        // MARK: - Transfer
+        .sheet(isPresented: $showTransfer) {
+            VStack(spacing: 20) {
+
+                Text("Transfer Call")
+                    .font(.headline)
+
+                TextField("Enter SIP user or number", text: self.$transferTarget)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .keyboardType(.asciiCapable)
+
+                Button("Transfer") {
+                    pjsipVars.dest = "sip:\(self.transferTarget)@sip.linphone.org"
+
+                    let userData =
+                        UnsafeMutableRawPointer(
+                            Unmanaged.passUnretained(pjsipVars).toOpaque()
+                        )
+
+                    pjsua_schedule_timer2_dbg(
+                        transfer_call,
+                        
+                        userData,
+                        0,
+                        "swift-transfer",
+                        0
+                    )
+
+                    self.showTransfer = false
+                }
+
+                Button("Cancel") {
+                    self.showTransfer = false
+                }
+                .foregroundColor(.red)
+            }
+            .padding()
         }
     }
 
     // MARK: - Buttons
 
-    private func actionButton(icon: String, title: String) -> some View {
-        VStack(spacing: 10) {
-            Circle()
-                .fill(Color.gray.opacity(0.25))
-                .frame(width: 72, height: 72)
-                .overlay(
-                    Image(systemName: icon)
-                        .font(.system(size: 24))
-                        .foregroundColor(.white)
-                )
-
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.white)
+    private var addCallButton: some View {
+        Button {
+            isAddingCall = true
+            toggleHold()
+            showDialer = true
+        } label: {
+            controlButton(icon: "person.badge.plus", title: "Add Call")
         }
+        .disabled(!pjsipVars.callAnswered || pjsipVars.isConference)
     }
 
     private var endCallButton: some View {
         Button {
-            triggerCallOrHangup()
-            presentationMode.wrappedValue.dismiss()
+            let userData =
+                UnsafeMutableRawPointer(
+                    Unmanaged.passUnretained(pjsipVars).toOpaque()
+                )
+
+            pjsua_schedule_timer2_dbg(
+                end_all_calls,
+                userData,
+                0,
+                "swift-end-all",
+                0
+            )
+
         } label: {
             Circle()
                 .fill(Color.red)
@@ -139,84 +207,82 @@ struct OngoingCallView: View {
                 )
         }
     }
-    
-    private var speakerButton: some View {
-        Button {
-            toggleSpeaker()
-        } label: {
-            VStack(spacing: 10) {
-                Circle()
-                    .fill(isSpeakerOn ? Color.white : Color.gray.opacity(0.25))
-                    .frame(width: 72, height: 72)
-                    .overlay(
-                        Image(systemName: "speaker.wave.2.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(isSpeakerOn ? .black : .white)
-                    )
 
-                Text("Speaker")
-                    .font(.caption)
-                    .foregroundColor(.white)
-            }
+    private var speakerButton: some View {
+        Button(action: toggleSpeaker) {
+            controlButton(
+                icon: "speaker.wave.2.fill",
+                title: "Speaker",
+                active: isSpeakerOn
+            )
         }
     }
-    
-    private var muteButton: some View {
-        Button {
-            toggleMute()
-        } label: {
-            VStack(spacing: 10) {
-                Circle()
-                    .fill(isMicMuted ? Color.white : Color.gray.opacity(0.25))
-                    .frame(width: 72, height: 72)
-                    .overlay(
-                        Image(systemName: isMicMuted ? "mic.slash.fill" : "mic.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(isMicMuted ? .black : .white)
-                    )
 
-                Text("Mute")
-                    .font(.caption)
-                    .foregroundColor(.white)
-            }
+    private var muteButton: some View {
+        Button(action: toggleMute) {
+            controlButton(
+                icon: isMicMuted ? "mic.slash.fill" : "mic.fill",
+                title: "Mute",
+                active: isMicMuted
+            )
         }
         .disabled(!pjsipVars.callAnswered)
     }
 
-    // MARK: - Mic Mute Control
-
-    private func toggleMute() {
-        guard pjsipVars.callAnswered else { return }
-
-        var ci = pjsua_call_info()
-        pjsua_call_get_info(pjsipVars.call_id, &ci)
-
-        guard ci.conf_slot != PJSUA_INVALID_ID.rawValue else { return }
-
-        if isMicMuted {
-            // Unmute mic
-            pjsua_conf_connect(0, ci.conf_slot)
-        } else {
-            // Mute mic
-            pjsua_conf_disconnect(0, ci.conf_slot)
+    private var holdButton: some View {
+        Button(action: toggleHold) {
+            controlButton(
+                icon: "pause.fill",
+                title: pjsipVars.isOnHold ? "Resume" : "Hold",
+                active: pjsipVars.isOnHold
+            )
         }
-
-        isMicMuted.toggle()
+        .disabled(!pjsipVars.callAnswered)
     }
 
-    // MARK: - Timer (starts ONLY on answer)
+    private var transferButton: some View {
+        Button {
+            showTransfer = true
+        } label: {
+            VStack(spacing: 6) {
+                Image(systemName: "arrowshape.turn.up.right.fill")
+                    .font(.system(size: 22))
+                Text("Transfer")
+                    .font(.caption)
+            }
+            .foregroundColor(.white)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func controlButton(icon: String, title: String, active: Bool = false) -> some View {
+        VStack(spacing: 10) {
+            Circle()
+                .fill(active ? Color.white : Color.gray.opacity(0.25))
+                .frame(width: 72, height: 72)
+                .overlay(
+                    Image(systemName: icon)
+                        .font(.system(size: 24))
+                        .foregroundColor(active ? .black : .white)
+                )
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+    }
+
+    // MARK: - Timer
 
     private var formattedTime: String {
-        let m = secondsElapsed / 60
-        let s = secondsElapsed % 60
-        return String(format: "%02d:%02d", m, s)
+        String(format: "%02d:%02d", secondsElapsed / 60, secondsElapsed % 60)
     }
 
     private func startTimer() {
-        secondsElapsed = 0
         timer?.invalidate()
+        secondsElapsed = 0
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            secondsElapsed += 1
+            self.secondsElapsed += 1
         }
     }
 
@@ -226,20 +292,48 @@ struct OngoingCallView: View {
         secondsElapsed = 0
     }
 
-    // MARK: - PJSIP
+    // MARK: - PJSIP Actions
 
-    private func triggerCallOrHangup() {
-        let userData =
-            UnsafeMutableRawPointer(
-                Unmanaged.passUnretained(pjsipVars).toOpaque()
-            )
-
-        pjsua_schedule_timer2_dbg(
-            call_func,
-            userData,
-            0,
-            "swift",
-            0
-        )
+    private func toggleSpeaker() {
+        isSpeakerOn.toggle()
+        let session = AVAudioSession.sharedInstance()
+        try? session.overrideOutputAudioPort(isSpeakerOn ? .speaker : .none)
     }
+
+    private func toggleMute() {
+        guard pjsipVars.callAnswered else { return }
+
+        isMicMuted.toggle()
+
+        // Get active call id
+        guard let callId = pjsipVars.activeCallIds.first else { return }
+
+        var callInfo = pjsua_call_info()
+        pjsua_call_get_info(callId, &callInfo)
+
+        let callPort = callInfo.conf_slot
+
+        if isMicMuted {
+            // MUTE: disconnect mic from call
+            pjsua_conf_disconnect(0, callPort)
+        } else {
+            // UNMUTE: reconnect mic to call
+            pjsua_conf_connect(0, callPort)
+        }
+    }
+
+    private func toggleHold() {
+        let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(pjsipVars).toOpaque())
+        pjsua_schedule_timer2_dbg(toggle_hold_call, userData, 0, "swift-hold", 0)
+    }
+
+    private func mergeCalls() {
+        let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(pjsipVars).toOpaque())
+        pjsua_schedule_timer2_dbg(merge_calls, userData, 0, "swift-merge", 0)
+    }
+
+//    private func triggerCallOrHangup() {
+//        let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(pjsipVars).toOpaque())
+//        pjsua_schedule_timer2_dbg(call_func, userData, 0, "swift", 0)
+//    }
 }

@@ -82,4 +82,24 @@ final class SIPManager {
             self.loginCompletion = nil
         }
     }
+    
+//    func transferCall(
+//        callId: pjsua_call_id,
+//        target: String
+//    ) -> Bool {
+//
+//        guard callId != PJSUA_INVALID_ID.rawValue else {
+//            return false
+//        }
+//
+//        let destStr = strdup(target)
+//        var dest = pj_str(destStr)
+//
+//        let status = pjsua_call_xfer(callId, &dest, nil)
+//
+//        free(destStr)
+//
+//        return status == PJ_SUCCESS.rawValue
+//    }
+
 }

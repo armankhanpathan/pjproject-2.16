@@ -10,10 +10,9 @@ import SwiftUI
 struct AccountView: View {
 
     @EnvironmentObject var appSession: AppSession
-    @EnvironmentObject var pjsipVars: PjsipVars
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 16) {
 
             Spacer()
 
@@ -21,13 +20,19 @@ struct AccountView: View {
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("Logged in as SIP user")
-                .foregroundColor(Color.gray)
+            VStack(spacing: 6) {
+                Text(appSession.sipUsername)
+                    .font(.headline)
+
+                Text(appSession.sipURI)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
 
             Button(action: logout) {
                 Text("Logout")
                     .fontWeight(.semibold)
-                    .foregroundColor(Color.white)
+                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.red)
@@ -39,12 +44,7 @@ struct AccountView: View {
         .padding()
     }
 
-    // MARK: - Logout
     private func logout() {
-        // Optional SIP cleanup
-        // SIPManager.shared.logout()
-
         appSession.logout()
     }
 }
-
