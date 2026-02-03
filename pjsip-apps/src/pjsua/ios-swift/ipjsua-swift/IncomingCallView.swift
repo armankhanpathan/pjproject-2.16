@@ -11,6 +11,23 @@ struct IncomingCallView: View {
 
     @EnvironmentObject var pjsipVars: PjsipVars
 
+    // MARK: - Helper to extract username
+    private var displayName: String {
+        // Input: "sip:38006@sip.linphone.org" OR "<sip:38006@sip.linphone.org>"
+        // Output: "38006"
+        
+        var clean = pjsipVars.dest
+            .replacingOccurrences(of: "<", with: "")
+            .replacingOccurrences(of: ">", with: "")
+            .replacingOccurrences(of: "sip:", with: "")
+        
+        if let atIndex = clean.firstIndex(of: "@") {
+            clean = String(clean[..<atIndex])
+        }
+        
+        return clean
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -23,7 +40,8 @@ struct IncomingCallView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                Text(pjsipVars.dest)
+                // CHANGED: Use displayName instead of pjsipVars.dest
+                Text(displayName)
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)

@@ -300,16 +300,27 @@ private func on_call_media_state(call_id: pjsua_call_id) {
 
     let vars = AppDelegate.Shared.pjsip_vars
 
+    // 1. If in Conference mode, let merge_calls handle the wiring.
     if vars.isConference {
         return
     }
 
+    // 2. If Transferring, do not interfere.
     if vars.isTransferInProgress {
         return
     }
-
+    
+    // 3. Get Call Info to check Media Status
     var ci = pjsua_call_info()
     pjsua_call_get_info(call_id, &ci)
+
+    // --- CRITICAL FIX ---
+    // Only connect audio if the media status is ACTIVE.
+    // If it is HOLD (Local or Remote), do NOT connect audio.
+    if ci.media_status != PJSUA_CALL_MEDIA_ACTIVE {
+        print("Call media is NOT active (Status: \(ci.media_status.rawValue)). Skipping audio connection.")
+        return
+    }
 
     let media: [pjsua_call_media_info] = tupleToArray(tuple: ci.media)
 
@@ -318,19 +329,19 @@ private func on_call_media_state(call_id: pjsua_call_id) {
         guard media[Int(mi)].type == PJMEDIA_TYPE_AUDIO else { continue }
 
         let call_conf_slot = media[Int(mi)].stream.aud.conf_slot
+        
         if call_conf_slot != PJSUA_INVALID_ID.rawValue {
 
             DispatchQueue.main.async {
                 vars.conferenceSlots[call_id] = Int(call_conf_slot)
             }
 
-            //  ONLY single-call wiring
+            // Standard 1-to-1 Audio Connection
             pjsua_conf_connect(call_conf_slot, 0)
             pjsua_conf_connect(0, call_conf_slot)
         }
     }
 }
-
 
 private func on_call_transfer_status(
     call_id: pjsua_call_id,

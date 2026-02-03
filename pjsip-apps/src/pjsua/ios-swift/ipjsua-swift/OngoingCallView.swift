@@ -26,6 +26,20 @@ struct OngoingCallView: View {
     @State private var showTransfer = false
     @State private var transferTarget = ""
 
+    // MARK: - Helper to extract username
+    private var displayName: String {
+        var clean = pjsipVars.dest
+            .replacingOccurrences(of: "<", with: "")
+            .replacingOccurrences(of: ">", with: "")
+            .replacingOccurrences(of: "sip:", with: "")
+        
+        if let atIndex = clean.firstIndex(of: "@") {
+            clean = String(clean[..<atIndex])
+        }
+        
+        return clean
+    }
+
     // MARK: - UI
 
     var body: some View {
@@ -41,8 +55,8 @@ struct OngoingCallView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                // SIP Username
-                Text(pjsipVars.dest)
+                // CHANGED: Use displayName instead of pjsipVars.dest
+                Text(displayName)
                     .font(.system(size: 34, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)
@@ -70,14 +84,6 @@ struct OngoingCallView: View {
                         muteButton
                     }
 
-                    // Merge Calls
-                    if pjsipVars.activeCallIds.count == 2 && !pjsipVars.isConference {
-                        Button("Merge Calls") {
-                            mergeCalls()
-                        }
-                        .foregroundColor(.blue)
-                    }
-
                     // Row 2
                     HStack(spacing: 56) {
                         transferButton
@@ -89,25 +95,25 @@ struct OngoingCallView: View {
                 Spacer(minLength: 28)
             }
         }
-
-//        .onAppear {
-//            if isAddingCall { return }
-//
-//            if !pjsipVars.callAnswered && !pjsipVars.hasIncomingCall {
-//                triggerCallOrHangup()
-//            }
-//        }
+        .onAppear {
+            if pjsipVars.callAnswered {
+                startTimer()
+            }
+        }
         .onDisappear {
             stopTimer()
         }
 
-        // callAnswered observer
-        .onReceive(Just(pjsipVars.callAnswered)) { answered in
-            answered ? startTimer() : stopTimer()
+        .onReceive(pjsipVars.$callAnswered) { answered in
+            if answered {
+                startTimer()
+            } else {
+                stopTimer()
+            }
         }
 
         // callEnded observer
-        .onReceive(Just(pjsipVars.callEnded)) { ended in
+        .onReceive(pjsipVars.$callEnded) { ended in
             if ended {
                 stopTimer()
                 presentationMode.wrappedValue.dismiss()
@@ -121,7 +127,7 @@ struct OngoingCallView: View {
             }
         }
 
-        // MARK: - Add Call Dial Pad 
+        // MARK: - Add Call Dial Pad
         .sheet(isPresented: $showDialer) {
             CallView()
                 .environmentObject(self.pjsipVars)
@@ -149,7 +155,6 @@ struct OngoingCallView: View {
 
                     pjsua_schedule_timer2_dbg(
                         transfer_call,
-                        
                         userData,
                         0,
                         "swift-transfer",
@@ -171,12 +176,21 @@ struct OngoingCallView: View {
     // MARK: - Buttons
 
     private var addCallButton: some View {
-        Button {
-            isAddingCall = true
-            toggleHold()
-            showDialer = true
+        let canMerge = pjsipVars.activeCallIds.count == 2 && !pjsipVars.isConference
+
+        return Button {
+            if canMerge {
+                mergeCalls()
+            } else {
+                isAddingCall = true
+                toggleHold()
+                showDialer = true
+            }
         } label: {
-            controlButton(icon: "person.badge.plus", title: "Add Call")
+            controlButton(
+                icon: canMerge ? "arrow.triangle.merge" : "person.badge.plus",
+                title: canMerge ? "Merge" : "Add Call"
+            )
         }
         .disabled(!pjsipVars.callAnswered || pjsipVars.isConference)
     }
@@ -279,10 +293,12 @@ struct OngoingCallView: View {
     }
 
     private func startTimer() {
-        timer?.invalidate()
+        guard timer == nil else { return }
         secondsElapsed = 0
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            self.secondsElapsed += 1
+            DispatchQueue.main.async {
+                self.secondsElapsed += 1
+            }
         }
     }
 
@@ -331,9 +347,4 @@ struct OngoingCallView: View {
         let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(pjsipVars).toOpaque())
         pjsua_schedule_timer2_dbg(merge_calls, userData, 0, "swift-merge", 0)
     }
-
-//    private func triggerCallOrHangup() {
-//        let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(pjsipVars).toOpaque())
-//        pjsua_schedule_timer2_dbg(call_func, userData, 0, "swift", 0)
-//    }
 }

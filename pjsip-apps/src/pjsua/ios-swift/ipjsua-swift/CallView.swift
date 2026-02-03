@@ -58,7 +58,7 @@ struct CallView: View {
                             Image(systemName: "delete.left")
                                 .font(.system(size: 26))
                                 .foregroundColor(.primary)
-                                .frame(width: 56, height: 56)
+                                .frame(width: 72, height: 72)
                                 .background(Color(UIColor.systemGray5))
                                 .clipShape(Circle())
                         }
@@ -168,7 +168,9 @@ struct DialKey: View {
     }
 }
 
-
+//#Preview {
+//    CallView()
+//}
 
 
 

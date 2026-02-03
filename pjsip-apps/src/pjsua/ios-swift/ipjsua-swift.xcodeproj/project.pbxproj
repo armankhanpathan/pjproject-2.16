@@ -600,7 +600,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ipjsua-swift/Preview Content\"";
-				DEVELOPMENT_TEAM = FWNRXZ6644;
+				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "ipjsua-swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -621,7 +621,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Libraries",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teluu.ipjsua-swift-linphone15";
+				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipneww;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ipjsua-swift/ipjsua-swift-Bridging-Header.h";
@@ -640,7 +640,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ipjsua-swift/Preview Content\"";
-				DEVELOPMENT_TEAM = FWNRXZ6644;
+				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "ipjsua-swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -661,7 +661,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Libraries",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teluu.ipjsua-swift-linphone15";
+				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipneww;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ipjsua-swift/ipjsua-swift-Bridging-Header.h";
@@ -675,21 +675,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3TRN37UBMA;
+				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teluu.ipjsua-swiftVidTest";
+				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipnew;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Teluu Profile";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -703,21 +701,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 3TRN37UBMA;
+				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teluu.ipjsua-swiftVidTest";
+				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipnew;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Teluu Profile";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
