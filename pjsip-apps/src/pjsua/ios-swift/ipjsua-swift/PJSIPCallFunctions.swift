@@ -252,3 +252,68 @@ func transfer_call(user_data: UnsafeMutableRawPointer?) {
         }
     }
 }
+
+func toggle_call_recording(user_data: UnsafeMutableRawPointer?) {
+    
+    guard let user_data else { return }
+    
+    let vars = Unmanaged<PjsipVars>
+        .fromOpaque(user_data)
+        .takeUnretainedValue()
+    
+    if vars.isRecording {
+        // MARK: --- STOP RECORDING
+        
+        if vars.recorderId != PJSUA_INVALID_ID.rawValue {
+            pjsua_recorder_destroy(vars.recorderId)
+            vars.recorderId = PJSUA_INVALID_ID.rawValue
+        }
+        
+        DispatchQueue.main.async {
+            vars.isRecording = false
+        }
+        print("Recording stopped.")
+        
+    } else {
+        // MARK: --- START RECORDING
+        
+        // 1. Generate Filename in Documents Directory
+        let fileName = "rec_\(Int(Date().timeIntervalSince1970)).wav"
+        guard let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let fileURL = docDir.appendingPathComponent(fileName)
+        let pathStr = fileURL.path
+        
+        // 2. Convert to pj_str_t
+        let cPath = strdup(pathStr)
+        var pjPath = pj_str(cPath)
+        defer { free(cPath) }
+        
+        // 3. Create Recorder
+        var recId = pjsua_recorder_id()
+        // enc_type=0 (PCM), source=NULL (we connect manually), max_size=0 (unlimited)
+        let status = pjsua_recorder_create(&pjPath, 0, nil, 0, 0, &recId)
+        
+        if status == PJ_SUCCESS.rawValue {
+            vars.recorderId = recId
+            
+            // 4. Get Recorder Port
+            let recPort = pjsua_recorder_get_conf_port(recId)
+            
+            // 5. Connect Microphone (0) -> Recorder
+            pjsua_conf_connect(0, recPort)
+            
+            // 6. Connect Active Calls -> Recorder
+            for (_, slotInt) in vars.conferenceSlots {
+                let callPort = pj_int32_t(slotInt)
+                pjsua_conf_connect(callPort, recPort)
+            }
+            
+            DispatchQueue.main.async {
+                vars.isRecording = true
+            }
+            print("Recording started: \(pathStr)")
+        } else {
+            print("Failed to create recorder: \(status)")
+        }
+    }
+}

@@ -58,6 +58,8 @@
 		7743A9BA2F1602E400694E8A /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7743A9B92F1602E400694E8A /* ContactsView.swift */; };
 		77599B542F14DEE700D0DAF5 /* IncomingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77599B532F14DEE700D0DAF5 /* IncomingCallView.swift */; };
 		7761815E2F03CAE400C3C4C0 /* SIPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7761815D2F03CAE400C3C4C0 /* SIPManager.swift */; };
+		777BA4332F3338CC00953F2C /* RecordingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777BA4322F3338CC00953F2C /* RecordingsViewModel.swift */; };
+		777BA4352F3338FA00953F2C /* RecordingsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777BA4342F3338FA00953F2C /* RecordingsListView.swift */; };
 		77B069B62F05011000F223BA /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B52F05011000F223BA /* LoginView.swift */; };
 		77B069B82F05036C00F223BA /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B069B72F05036C00F223BA /* CallView.swift */; };
 		77D62C6E2F0CC91600C57E1C /* OngoingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */; };
@@ -135,6 +137,8 @@
 		7743A9B92F1602E400694E8A /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
 		77599B532F14DEE700D0DAF5 /* IncomingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallView.swift; sourceTree = "<group>"; };
 		7761815D2F03CAE400C3C4C0 /* SIPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIPManager.swift; sourceTree = "<group>"; };
+		777BA4322F3338CC00953F2C /* RecordingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsViewModel.swift; sourceTree = "<group>"; };
+		777BA4342F3338FA00953F2C /* RecordingsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsListView.swift; sourceTree = "<group>"; };
 		77B069B52F05011000F223BA /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		77B069B72F05036C00F223BA /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
 		77D62C6D2F0CC91600C57E1C /* OngoingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OngoingCallView.swift; sourceTree = "<group>"; };
@@ -236,16 +240,18 @@
 				7743A9B72F1602D200694E8A /* ContactsViewModel.swift */,
 				7743A9B92F1602E400694E8A /* ContactsView.swift */,
 				77D62C712F0CC97E00C57E1C /* PJSIPCallFunctions.swift */,
+				777BA4322F3338CC00953F2C /* RecordingsViewModel.swift */,
+				777BA4342F3338FA00953F2C /* RecordingsListView.swift */,
 				3A6FC61B25CBD4540065F472 /* ipjsua_swiftApp.swift */,
 				77D62C752F0D26C900C57E1C /* RootView.swift */,
 				77D62C772F0D26DD00C57E1C /* MainTabView.swift */,
 				3A6FC61D25CBD4540065F472 /* ContentView.swift */,
+				7761815D2F03CAE400C3C4C0 /* SIPManager.swift */,
 				3A6FC61F25CBD4550065F472 /* Assets.xcassets */,
 				3A6FC62425CBD4550065F472 /* Info.plist */,
 				3A6FC62125CBD4550065F472 /* Preview Content */,
 				3A6FC77025CBDB620065F472 /* pjsip.m */,
 				3A6FC76F25CBDB620065F472 /* ipjsua-swift-Bridging-Header.h */,
-				7761815D2F03CAE400C3C4C0 /* SIPManager.swift */,
 			);
 			path = "ipjsua-swift";
 			sourceTree = "<group>";
@@ -421,11 +427,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				777BA4332F3338CC00953F2C /* RecordingsViewModel.swift in Sources */,
 				77D62C7A2F0D295B00C57E1C /* AccountView.swift in Sources */,
 				77D62C742F0D263100C57E1C /* AppSession.swift in Sources */,
 				77599B542F14DEE700D0DAF5 /* IncomingCallView.swift in Sources */,
 				7743A9BA2F1602E400694E8A /* ContactsView.swift in Sources */,
 				7743A9B82F1602D200694E8A /* ContactsViewModel.swift in Sources */,
+				777BA4352F3338FA00953F2C /* RecordingsListView.swift in Sources */,
 				77B069B82F05036C00F223BA /* CallView.swift in Sources */,
 				3A6FC77125CBDB620065F472 /* pjsip.m in Sources */,
 				3A6FC61E25CBD4540065F472 /* ContentView.swift in Sources */,
@@ -594,15 +602,17 @@
 		3A6FC62825CBD4550065F472 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ipjsua-swift/Preview Content\"";
 				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "ipjsua-swift/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = WeCall;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -621,6 +631,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Libraries",
 				);
+				MARKETING_VERSION = 1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipneww;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -634,15 +645,17 @@
 		3A6FC62925CBD4550065F472 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ipjsua-swift/Preview Content\"";
 				DEVELOPMENT_TEAM = 8Y757S9WC3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "ipjsua-swift/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = WeCall;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -661,6 +674,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Libraries",
 				);
+				MARKETING_VERSION = 1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.armanpathan.pjsipneww;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

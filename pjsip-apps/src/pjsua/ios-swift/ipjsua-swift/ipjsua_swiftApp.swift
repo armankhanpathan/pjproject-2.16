@@ -32,6 +32,9 @@ class PjsipVars: ObservableObject {
     @Published var hasIncomingCall = false
     @Published var showOngoingCall = false
     
+    @Published var isRecording: Bool = false
+        var recorderId: pjsua_recorder_id = PJSUA_INVALID_ID.rawValue
+    
     @Published var activeCallIds: [pjsua_call_id] = []
     @Published var conferenceSlots: [pjsua_call_id: Int] = [:]
     @Published var isConference: Bool = false
